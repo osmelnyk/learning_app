@@ -15,6 +15,25 @@ class ModulePage extends StatelessWidget {
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             )),
+        leading: IconButton(
+          icon: const Icon(Icons.person),
+          onPressed: () {
+            Navigator.of(context).pushNamed(
+              '/profile',
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.newspaper),
+            tooltip: 'News',
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                '/news',
+              );
+            },
+          )
+        ],
       ),
       body: BlocProvider(
         create: (context) => ModuleBloc()..add(const GetModules(1, 'en')),

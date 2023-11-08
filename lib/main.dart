@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learning_app/presentation/pages/lesson_page.dart';
-import 'package:learning_app/presentation/pages/module_page.dart';
+import 'router.dart';
 
 void main() {
   runApp(const App());
@@ -13,20 +12,17 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo2',
+      title: 'DART Leaning',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: const ModulePage(),
       initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        '/': (BuildContext context) => const ModulePage(),
-        '/lesson': (BuildContext context) {
-          final id = ModalRoute.of(context)!.settings.arguments as int;
-          return LessonPage(moduleId: id);
-        }
-      },
+      routes: routes,
+      onUnknownRoute: unknownRoute,
+      navigatorObservers:
+          // guard protected routes
+          [RouteGuard()],
     );
   }
 }

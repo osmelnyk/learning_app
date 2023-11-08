@@ -15,7 +15,7 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
       try {
         final lessons =
             await DBRepository().getLessons(event.moduleId, event.language);
-        log(lessons.toString());
+        // log(lessons.toString());
         emit(LessonLoaded(lessons));
       } catch (e) {
         log(e.toString());
