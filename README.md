@@ -10,3 +10,13 @@
   <summary>Bloc</summary>
   <img src="./assets/bloc-data.gif">
  </details>
+
+  <details> 
+  <summary>Navigation</summary>
+  <img src="./assets/navigation.gif">
+ </details>
+
+  <details> 
+  <summary>Network</summary>
+  <img src="./assets/network_api.gif">
+ </details>
