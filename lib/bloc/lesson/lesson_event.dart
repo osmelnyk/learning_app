@@ -13,3 +13,4 @@ class GetLessons extends LessonEvent {
   @override
   List<Object> get props => [moduleId, language];
 }
+

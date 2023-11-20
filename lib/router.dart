@@ -13,8 +13,8 @@ Map<String, WidgetBuilder> get routes {
     '/login': (_) => const LoginPage(),
     '/profile': (_) => const ProfilePage(),
     '/lesson': (context) {
-      final id = ModalRoute.of(context)!.settings.arguments as int;
-      return LessonPage(moduleId: id);
+      final args = ModalRoute.of(context)!.settings.arguments as Map;
+      return LessonPage(args: args);
     },
     '/news': (_) => const HackerNewsPage(),
     '/error': (context) {

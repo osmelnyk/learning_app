@@ -15,7 +15,6 @@ class HackerNewsCubit extends Cubit<HackerNewsState> {
   Future<void> getTopStories() async {
     try {
       emit(NewsLoading());
-      log('get news started');
       final news = await _hNRepository.getTopStories();
       emit(NewsLoaded(news));
     } catch (e) {
