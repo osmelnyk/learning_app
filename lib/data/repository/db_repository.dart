@@ -28,9 +28,4 @@ class DBRepository {
   Future<void> updateProgress(Progress progress) async {
     await _dbDatasource.updateProgress(progress: progress);
   }
-
-  Future<Progress> getProgress(int moduleId) async {
-    final finishedLesson = await _dbDatasource.setOrGetProgress(moduleId);
-    return Progress.fromMap(finishedLesson);
-  }
 }

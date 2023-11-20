@@ -87,41 +87,25 @@ class DBDatasource {
     required Progress progress,
   }) async {
     final db = await open();
-    return db.update(
-        'progress',
-        {
-          'module_id': progress.moduleId,
-          'finished_lesson': progress.finishedLesson
-        },
-        where: 'module_id = ?',
-        whereArgs: [progress.moduleId]);
-  }
-
-  Future<Map<String, dynamic>> getProgress(int moduleId) async {
-    final db = await open();
-    final progress = await db.query(
-      'progress',
-      where: 'module_id = ?',
-      whereArgs: [moduleId],
-    );
-    return progress.first;
-  }
-
-  Future<Map<String, dynamic>> setOrGetProgress(int moduleId) async {
-    final db = await open();
     var result = await db.query(
       'progress',
       where: 'module_id = ?',
-      whereArgs: [moduleId],
+      whereArgs: [progress.moduleId],
     );
     if (result.isEmpty) {
-      await db.insert(
+      return await db.insert(
         'progress',
-        {'module_id': moduleId, 'finished_lesson': 0},
+        {'module_id': progress.moduleId, 'finished_lesson': 0},
       );
-      return <String, dynamic>{'module_id': moduleId, 'finished_lesson': 0};
     } else {
-      return result.first;
+      return db.update(
+          'progress',
+          {
+            'module_id': progress.moduleId,
+            'finished_lesson': progress.finishedLesson
+          },
+          where: 'module_id = ?',
+          whereArgs: [progress.moduleId]);
     }
   }
 }

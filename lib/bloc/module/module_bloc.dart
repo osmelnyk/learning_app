@@ -27,9 +27,7 @@ class ModuleBloc extends Bloc<ModuleEvent, ModulesState> {
     on<GetModule>((event, emit) async {
       try {
         final module = await DBRepository().getModule(event.moduleId);
-
         emit(ModuleLoaded(module));
-        log('module get: ${state.toString()}');
       } catch (e) {
         log("Error: ${e.toString()}");
         emit(ModulesLoadingError(e.toString()));
@@ -41,7 +39,6 @@ class ModuleBloc extends Bloc<ModuleEvent, ModulesState> {
       if (state is ModulesLoaded) {
         await DBRepository().updateProgress(event.progress);
         List<Module> modules = List.from(state.modules);
-        log(event.progress.finishedLesson.toString());
         int indexToChange = modules
             .indexWhere((element) => element.id == event.progress.moduleId);
         if (indexToChange != -1) {
@@ -50,11 +47,9 @@ class ModuleBloc extends Bloc<ModuleEvent, ModulesState> {
               finishedLesson: event.progress.finishedLesson);
 
           modules[indexToChange] = updatedItem;
-          log(modules.toString());
         }
 
         emit(ModulesLoaded(modules: modules));
-        // log('modulessssss set: ${state.toString()}');
       }
     });
   }
