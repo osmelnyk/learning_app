@@ -78,8 +78,12 @@ class DBDatasource {
   Future<List<Map<String, dynamic>>> getLessons(
       int moduleId, String language) async {
     final db = await open();
-    final lessons = await db.query('lessons',
-        where: 'module_id =?', whereArgs: [moduleId], orderBy: 'position ASC');
+    final lessons = await db.query(
+      'lessons',
+      where: 'module_id =?',
+      whereArgs: [moduleId],
+      orderBy: 'position ASC',
+    );
     return lessons;
   }
 
@@ -95,7 +99,10 @@ class DBDatasource {
     if (result.isEmpty) {
       return await db.insert(
         'progress',
-        {'module_id': progress.moduleId, 'finished_lesson': 0},
+        {
+          'module_id': progress.moduleId,
+          'finished_lesson': 0,
+        },
       );
     } else {
       return db.update(

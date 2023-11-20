@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/lesson/lesson_bloc.dart';
@@ -42,7 +40,6 @@ class _LessonPageState extends State<LessonPage> {
   }
 
   void _goToPreviousPage(BuildContext context) {
-    context.read<ModuleBloc>().add(const GetModules(1, 'en'));
     _pageController.previousPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -58,7 +55,6 @@ class _LessonPageState extends State<LessonPage> {
 
     if (_currentPage + 1 > savedProgress) {
       context.read<ModuleBloc>().add(SetProgress(progress));
-      // context.read<ModuleBloc>().add(GetModules(1, 'en'));
     }
 
     _isCorrect = false;
@@ -103,7 +99,6 @@ class _LessonPageState extends State<LessonPage> {
                       moduleId: widget.args['module_id'],
                     );
                     context.read<ModuleBloc>().add(SetProgress(progress));
-                    // context.read<ModuleBloc>().add(GetModules(1, 'en'));
                     _pageController.animateTo(0,
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.ease);
@@ -136,7 +131,6 @@ class _LessonPageState extends State<LessonPage> {
                             alignment: Alignment.bottomCenter,
                             child: FloatingActionButton(
                               onPressed: () {
-                                log('isCorrect: $_isCorrect');
                                 if (lesson.type == 'select' && _isCorrect) {
                                   _goToNextPage(context, length, savedProgress);
                                 } else if (lesson.type == 'description') {
