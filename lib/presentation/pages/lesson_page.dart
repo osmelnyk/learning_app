@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/lesson/lesson_bloc.dart';
@@ -5,6 +7,8 @@ import '../../bloc/module/module_bloc.dart';
 import '../../data/model/lesson_model.dart';
 import '../../data/model/progress_model.dart';
 import '../widgets/select_answer.dart';
+// import 'package:markdown/markdown.dart' as md;
+import 'package:markdown_widget/markdown_widget.dart';
 
 class LessonPage extends StatefulWidget {
   final Map args;
@@ -123,15 +127,21 @@ class _LessonPageState extends State<LessonPage> {
                     },
                     itemBuilder: (context, index) {
                       final Lesson lesson = lessonState.lessons[index];
+                      final bool answered = savedProgress > index;
                       return Stack(children: [
-                        _lessonBody(lesson),
+                        _lessonBody(lesson, answered),
                         Positioned.fill(
                           bottom: 10,
                           child: Align(
                             alignment: Alignment.bottomCenter,
                             child: FloatingActionButton(
                               onPressed: () {
-                                if (lesson.type == 'select' && _isCorrect) {
+                                log('$index: $savedProgress');
+
+                                if (savedProgress > _currentPage) {
+                                  _goToNextPage(context, length, savedProgress);
+                                } else if (lesson.type == 'select' &&
+                                    _isCorrect) {
                                   _goToNextPage(context, length, savedProgress);
                                 } else if (lesson.type == 'description') {
                                   _goToNextPage(context, length, savedProgress);
@@ -157,15 +167,18 @@ class _LessonPageState extends State<LessonPage> {
     });
   }
 
-  Widget _lessonBody(Lesson lesson) {
+  Widget _lessonBody(Lesson lesson, bool answered) {
     switch (lesson.type) {
       case 'description':
-        return Text(
-          '${lesson.description}',
-          style: const TextStyle(fontSize: 20),
-        );
+        return MarkdownWidget(
+            data: '${lesson.description}',
+            config: MarkdownConfig(configs: [
+              const PreConfig(language: 'dart'),
+            ])
+            );
       case 'select':
         return SelectAnswer(
+          answered: answered,
           description: lesson.description,
           answers: lesson.answer,
           // checked:

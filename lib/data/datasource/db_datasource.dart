@@ -5,31 +5,41 @@ import 'package:path/path.dart';
 
 import '../model/progress_model.dart';
 
+bool delete = true;
+
 class DBDatasource {
   // open database
   Future<Database> open() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'app.db');
     bool exists = await databaseExists(path);
-
     // delete existing database to load new data
-    // await deleteDatabase(path);
-
-    if (!exists) {
+    if (exists) {
+      if (delete) {
+        await deleteDatabase(path);
+        await _createDB(path);
+        delete = false;
+        // log("db Delete");
+      }
+    } else {
       // Make sure the parent directory exists
-      try {
-        await Directory(dirname(path)).create(recursive: true);
-      } catch (_) {}
-
-      // Copy from asset
-      ByteData data = await rootBundle.load(url.join("assets", "app.db"));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-
-      // Write and flush the bytes written
-      await File(path).writeAsBytes(bytes, flush: true);
+      await _createDB(path);
     }
     return await openDatabase(path, version: 1);
+  }
+
+  Future<void> _createDB(String path) async {
+    try {
+      await Directory(dirname(path)).create(recursive: true);
+    } catch (_) {}
+
+    // Copy from asset
+    ByteData data = await rootBundle.load(url.join("assets", "app.db"));
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+    // Write and flush the bytes written
+    await File(path).writeAsBytes(bytes, flush: true);
   }
 
   Future<List<Map<String, dynamic>>> getCourses() async {

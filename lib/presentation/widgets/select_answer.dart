@@ -1,13 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SelectAnswer extends StatefulWidget {
   final String? description;
   final dynamic answers;
+  final bool answered;
   final Function(bool) isCorrect;
 
   const SelectAnswer(
-      {super.key, this.description, this.answers, required this.isCorrect});
+      {super.key,
+      this.description,
+      this.answers,
+      required this.isCorrect,
+      required this.answered});
 
   @override
   State<StatefulWidget> createState() => _SelectAnswerState();
@@ -21,6 +28,13 @@ class _SelectAnswerState extends State<SelectAnswer> {
   void initState() {
     super.initState();
     _getCorrectAnswer();
+    _setCorrectAnswer();
+  }
+
+  void _setCorrectAnswer() {
+    log(widget.answered.toString());
+    if (widget.answered)
+      setState(() => _selectedAnswers.addAll(_correctAnswers));
   }
 
   void _getCorrectAnswer() {
@@ -39,11 +53,6 @@ class _SelectAnswerState extends State<SelectAnswer> {
     widget.isCorrect(isCorrect);
   }
 
-  // bool checkAnswer() {
-  //   bool isCorrect = listEquals(_selectedAnswers, _correctAnswers);
-  //   return isCorrect;
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -59,7 +68,9 @@ class _SelectAnswerState extends State<SelectAnswer> {
                   side: BorderSide(
                 width: 2.0,
                 color: _selectedAnswers.contains(index)
-                    ? Color.fromARGB(255, 252, 195, 51)
+                    ? widget.answered
+                        ? Colors.green
+                        : Colors.yellowAccent
                     : Colors.grey,
               )),
               onPressed: () {
