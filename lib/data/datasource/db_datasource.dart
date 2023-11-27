@@ -1,22 +1,34 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+
+import '../model/progress_model.dart';
+
+bool delete = true;
 
 class DBDatasource {
   // open database
   Future<Database> open() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'app.db');
-    log(path);
     bool exists = await databaseExists(path);
-
     // delete existing database to load new data
-    await deleteDatabase(path);
+    if (exists) {
+      if (delete) {
+        await deleteDatabase(path);
+        await _createDB(path);
+        delete = false;
+        // log("db Delete");
+      }
+    } else {
+      // Make sure the parent directory exists
+      await _createDB(path);
+    }
+    return await openDatabase(path, version: 1);
+  }
 
-    // if (!exists) {
-    // Make sure the parent directory exists
+  Future<void> _createDB(String path) async {
     try {
       await Directory(dirname(path)).create(recursive: true);
     } catch (_) {}
@@ -28,8 +40,6 @@ class DBDatasource {
 
     // Write and flush the bytes written
     await File(path).writeAsBytes(bytes, flush: true);
-    // }
-    return await openDatabase(path, version: 2);
   }
 
   Future<List<Map<String, dynamic>>> getCourses() async {
@@ -40,15 +50,79 @@ class DBDatasource {
   Future<List<Map<String, dynamic>>> getModules(
       int courseId, String language) async {
     final db = await open();
-    final modules =
-        await db.query('modules', where: 'course_id =?', whereArgs: [courseId]);
-    log(modules.toString());
+    final modules = await db.rawQuery('''
+        SELECT 
+          modules.id,
+          name,
+          description,
+          language_code,
+          course_id,
+          progress.finished_lesson as finished_lesson
+        FROM modules 
+        LEFT JOIN progress 
+        ON progress.module_id = modules.module_id 
+        WHERE language_code = '$language'
+        AND course_id = '$courseId'
+        ''');
     return modules;
+  }
+
+  Future<Map<String, dynamic>> getModule(int moduleId) async {
+    final db = await open();
+    final module = await db.rawQuery('''
+        SELECT 
+          modules.id,
+          name,
+          description,
+          language_code,
+          course_id,
+          progress.finished_lesson as finished_lesson
+        FROM modules 
+        LEFT JOIN progress 
+        ON modules.id = progress.module_id
+        WHERE modules.id = '$moduleId'
+        ''');
+    return module.first;
   }
 
   Future<List<Map<String, dynamic>>> getLessons(
       int moduleId, String language) async {
     final db = await open();
-    return db.query('lessons', where: 'module_id =?', whereArgs: [moduleId]);
+    final lessons = await db.query(
+      'lessons',
+      where: 'module_id =?',
+      whereArgs: [moduleId],
+      orderBy: 'position ASC',
+    );
+    return lessons;
+  }
+
+  Future updateProgress({
+    required Progress progress,
+  }) async {
+    final db = await open();
+    var result = await db.query(
+      'progress',
+      where: 'module_id = ?',
+      whereArgs: [progress.moduleId],
+    );
+    if (result.isEmpty) {
+      return await db.insert(
+        'progress',
+        {
+          'module_id': progress.moduleId,
+          'finished_lesson': 0,
+        },
+      );
+    } else {
+      return db.update(
+          'progress',
+          {
+            'module_id': progress.moduleId,
+            'finished_lesson': progress.finishedLesson
+          },
+          where: 'module_id = ?',
+          whereArgs: [progress.moduleId]);
+    }
   }
 }

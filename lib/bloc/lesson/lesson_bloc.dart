@@ -10,17 +10,19 @@ part 'lesson_state.dart';
 
 class LessonBloc extends Bloc<LessonEvent, LessonState> {
   LessonBloc() : super(LessonInitial()) {
-    on<GetLessons>((event, emit) async {
-      emit(LessonLoading());
-      try {
-        final lessons =
-            await DBRepository().getLessons(event.moduleId, event.language);
-        log(lessons.toString());
-        emit(LessonLoaded(lessons));
-      } catch (e) {
-        log(e.toString());
-        emit(LessonLoadingError(e.toString()));
-      }
-    });
+    on<GetLessons>(
+      (event, emit) async {
+        emit(LessonLoading());
+        try {
+          final lessons =
+              await DBRepository().getLessons(event.moduleId, event.language);
+          // log(lessons.toString());
+          emit(LessonLoaded(lessons));
+        } catch (e) {
+          log(e.toString());
+          emit(LessonLoadingError(e.toString()));
+        }
+      },
+    );
   }
 }

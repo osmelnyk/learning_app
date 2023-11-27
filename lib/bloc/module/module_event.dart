@@ -14,3 +14,23 @@ class GetModules extends ModuleEvent {
   @override
   List<Object> get props => [courseId, language];
 }
+
+
+class GetModule extends ModuleEvent {
+  final int moduleId;
+
+  const GetModule(this.moduleId);
+
+  @override
+  List<Object> get props => [moduleId];
+}
+
+class SetProgress extends ModuleEvent {
+  final Progress progress;
+  // final String language;
+
+  const SetProgress(this.progress);
+
+  @override
+  List<Object> get props => [progress];
+}

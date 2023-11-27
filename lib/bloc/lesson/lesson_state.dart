@@ -28,3 +28,4 @@ final class LessonLoadingError extends LessonState {
   @override
   List<Object> get props => [message];
 }
+
